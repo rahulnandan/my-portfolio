@@ -1,0 +1,52 @@
+name: Reusable - Deploy to ECS Fargate
+
+# Registers a new task definition revision pointing at the given image and
+# updates the ECS service to use it. Authenticates to AWS via short-lived
+# OIDC credentials (no static access keys stored anywhere) - the assumed
+# role's trust policy (see infra/terraform/oidc.tf) only allows this repo's
+# master branch to assume it.
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        description: Full image reference to deploy (e.g. user/portfolio:master-abc123).
+        type: string
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Fetch current task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition "${{ vars.ECS_TASK_DEFINITION_FAMILY }}" \
+            --query taskDefinition > task-definition.json
+
+      - name: Render new task definition with updated image
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ vars.CONTAINER_NAME }}
+          image: ${{ inputs.image }}
+
+      - name: Deploy to ECS and wait for stability
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          service: ${{ vars.ECS_SERVICE }}
+          cluster: ${{ vars.ECS_CLUSTER }}
+          wait-for-service-stability: true

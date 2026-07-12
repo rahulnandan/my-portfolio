@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /mnt/d/Rahul/Code/my-portfolio/src/main/java/com/rahulnandan/portfolio/config \\\\ *)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker\" version)"
+    ],
+    "additionalDirectories": [
+      "/mnt/d/Rahul/Code/my-portfolio/src/main/java/com/rahulnandan/portfolio"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+name: Reusable - Publish Analysis to GitHub Pages
+
+# Publishes the static-analysis report artifact to the gh-pages branch,
+# under a per-branch path (keep_files: true means branches don't clobber
+# each other) - e.g. https://<user>.github.io/<repo>/master/ and
+# https://<user>.github.io/<repo>/feature-x/. Uses the automatic
+# GITHUB_TOKEN, no extra secret required.
+
+on:
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download analysis site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: analysis-site
+          path: site
+
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          destination_dir: ${{ github.ref_name }}
+          keep_files: true

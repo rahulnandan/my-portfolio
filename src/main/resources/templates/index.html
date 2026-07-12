@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${resume.name()} + ' | ' + ${resume.title()}">Portfolio</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --accent: #2563eb;
+      --bg: #ffffff;
+      --fg: #1a1a1a;
+      --muted: #5b5b5b;
+      --card: #f5f7fa;
+      --border: #e2e5ea;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1115;
+        --fg: #e8e8e8;
+        --muted: #a3a3a3;
+        --card: #171a21;
+        --border: #2a2e37;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.55;
+    }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+    header.hero { margin-bottom: 2rem; }
+    h1 { margin: 0 0 0.25rem; font-size: 2rem; }
+    .title { color: var(--accent); font-weight: 600; margin: 0 0 0.75rem; }
+    .contact-line { color: var(--muted); font-size: 0.92rem; }
+    .contact-line span { margin-right: 1rem; }
+    section { margin-top: 2.25rem; }
+    h2 {
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.4rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+    .summary { color: var(--fg); }
+    .skill-group { margin-bottom: 0.6rem; }
+    .skill-group .cat { font-weight: 600; }
+    .skill-group .items { color: var(--muted); }
+    .job { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+    .job-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.25rem 1rem; margin-bottom: 0.5rem; }
+    .job-title { font-weight: 700; }
+    .job-company { color: var(--accent); }
+    .job-period { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
+    ul.bullets { margin: 0.25rem 0 0; padding-left: 1.2rem; }
+    ul.bullets li { margin-bottom: 0.3rem; }
+    ul.plain { margin: 0; padding-left: 1.2rem; }
+    ul.plain li { margin-bottom: 0.3rem; }
+    footer { margin-top: 3rem; color: var(--muted); font-size: 0.85rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1 th:text="${resume.name()}">Name</h1>
+      <p class="title" th:text="${resume.title()}">Title</p>
+      <p class="contact-line">
+        <span th:text="${resume.location()}">Location</span>
+        <span th:text="${resume.email()}">Email</span>
+        <span th:text="${resume.phone()}">Phone</span>
+        <span th:text="${resume.linkedin()}">LinkedIn</span>
+      </p>
+    </header>
+
+    <section>
+      <h2>Summary</h2>
+      <p class="summary" th:text="${resume.summary()}">Summary</p>
+    </section>
+
+    <section>
+      <h2>Core Skills</h2>
+      <div class="skill-group" th:each="g : ${resume.skillGroups()}">
+        <span class="cat" th:text="${g.category()} + ': '">Category</span>
+        <span class="items" th:text="${g.items()}">Items</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Professional Experience</h2>
+      <div class="job" th:each="job : ${resume.experience()}">
+        <div class="job-head">
+          <div>
+            <div class="job-title" th:text="${job.title()}">Title</div>
+            <div class="job-company" th:text="${job.company()} + ' - ' + ${job.location()}">Company</div>
+          </div>
+          <div class="job-period" th:text="${job.period()}">Period</div>
+        </div>
+        <ul class="bullets">
+          <li th:each="b : ${job.bullets()}" th:text="${b}">Bullet</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Certifications &amp; Awards</h2>
+      <ul class="plain">
+        <li th:each="c : ${resume.certifications()}" th:text="${c}">Cert</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Education</h2>
+      <ul class="plain">
+        <li th:each="e : ${resume.education()}"
+            th:text="${e.degree()} + ' - ' + ${e.institution()} + ' (' + ${e.period()} + ')'">Degree</li>
+      </ul>
+    </section>
+
+    <footer>
+      <p>Built and deployed via a GitHub Actions CI/CD pipeline to AWS ECS Fargate.</p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+name: CD - Master
+
+# Runs on every push to master (a merged PR lands here as a push event):
+# the same build/analysis/pages/docker pipeline as feature branches, plus
+# tagging :latest and deploying to ECS Fargate via OIDC.
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: cd-master
+  cancel-in-progress: false # never cancel a deploy mid-flight; queue instead
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    uses: ./.github/workflows/reusable-build-test.yml
+
+  static-analysis:
+    needs: build-test
+    uses: ./.github/workflows/reusable-static-analysis.yml
+
+  publish-pages:
+    needs: static-analysis
+    permissions:
+      contents: write
+    uses: ./.github/workflows/reusable-publish-pages.yml
+
+  docker-build-push:
+    needs: build-test
+    uses: ./.github/workflows/reusable-docker-build-push.yml
+    with:
+      push-latest: true
+    secrets:
+      dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  deploy:
+    needs: docker-build-push
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/reusable-deploy-ecs.yml
+    with:
+      image: ${{ needs.docker-build-push.outputs.image }}

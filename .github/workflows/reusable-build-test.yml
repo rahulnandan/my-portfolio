@@ -1,0 +1,33 @@
+name: Reusable - Build & Test
+
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        type: string
+        default: "21"
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ inputs.java-version }}
+          cache: maven
+
+      - name: Compile and test
+        run: mvn -B verify
+
+      - name: Upload jar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-jar
+          path: target/portfolio.jar
+          retention-days: 7

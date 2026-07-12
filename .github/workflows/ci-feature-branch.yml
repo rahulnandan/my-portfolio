@@ -1,0 +1,41 @@
+name: CI - Feature Branch
+
+# Runs on every push to any branch except master: compile+test, static
+# analysis published to GitHub Pages, and a Docker image build/push tagged
+# with the branch+sha (not :latest). No AWS deploy here - a shared public
+# ECS service shouldn't be redeployed on every feature push.
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    uses: ./.github/workflows/reusable-build-test.yml
+
+  static-analysis:
+    needs: build-test
+    uses: ./.github/workflows/reusable-static-analysis.yml
+
+  publish-pages:
+    needs: static-analysis
+    permissions:
+      contents: write
+    uses: ./.github/workflows/reusable-publish-pages.yml
+
+  docker-build-push:
+    needs: build-test
+    uses: ./.github/workflows/reusable-docker-build-push.yml
+    with:
+      push-latest: false
+    secrets:
+      dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}

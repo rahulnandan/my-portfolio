@@ -1,0 +1,126 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: portfolio
+  thymeleaf:
+    cache: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+resume:
+  name: Rahul Kumar Nandan
+  title: "Senior DevOps Architect | Cloud & Platform Engineering Leader"
+  location: Pune, India
+  email: rahul.nandan2007@gmail.com
+  phone: "+91 9903377795"
+  linkedin: linkedin.com/in/rahul-kumar-nandan
+  summary: >
+    DevOps and Cloud Platform Architect with 14+ years of experience designing, delivering and
+    operating secure, scalable and cost-efficient cloud solutions on AWS and Azure. Proven track
+    record of leading cloud migrations and DevOps transformation programs, building
+    Infrastructure-as-Code, CI/CD and observability foundations, and driving measurable
+    reliability and cost improvements. Hands-on leader who builds and mentors engineering teams,
+    partners with product and finance stakeholders, and establishes operating standards that keep
+    platforms reliable, secure and fast.
+  skillGroups:
+    - category: Cloud Platforms
+      items: >
+        AWS (EKS, EC2, Lambda, RDS, API Gateway, SES, SQS/SNS, SSM, WAF, GuardDuty, SecurityHub,
+        CloudTrail, Config, Network Firewall, Cost Explorer), Azure, Cloudflare (Edge/CDN/WAF)
+    - category: DevOps & IaC
+      items: >
+        Terraform, Ansible, Helm, GitOps (ArgoCD), Jenkins, CI/CD pipelines, Build & Release
+        automation, Octopus, GitHub Actions
+    - category: Containers & Orchestration
+      items: "Kubernetes (EKS, self-managed), Docker, Istio service mesh, OAuth2/OIDC (Okta)"
+    - category: Languages
+      items: "Python, Go (Golang), Bash/Shell, Groovy, JavaScript/TypeScript (Node.js ecosystem), .NET Core"
+    - category: Observability & SRE
+      items: "Prometheus, Grafana, InfluxDB, VictoriaMetrics, Datadog, FluentD/Fluent Bit, Elasticsearch (ECK), Telegraf, CloudWatch"
+    - category: Security & Compliance
+      items: >
+        WAF, Trivy, Harbor, AWS SecurityHub/Config/GuardDuty, VPC Flow Logs, IAM/RBAC, Secrets
+        management, Patch management
+    - category: Leadership
+      items: >
+        Team building, mentoring, technical roadmap ownership, stakeholder management with
+        Product, Architecture and Finance/CFO office
+  experience:
+    - title: Staff Cloud DevOps Engineer
+      company: Snowflake
+      location: Pune, India
+      period: "Apr 2024 - Present"
+      bullets:
+        - Lead centralised cloud security program across Snowflake IT AWS accounts, standardising GuardDuty, CloudTrail, Config, SecurityHub, Network Firewall Manager and SSM to strengthen the security posture of a multi-account AWS organization.
+        - Partner with engineering teams as an internal cloud architect, guiding CI/CD pipeline design, Helm templating and workload deployment patterns on Amazon EKS.
+        - Perform zero-downtime EKS cluster upgrades, and operate cluster-wide agents and platform add-ons at scale for production-critical workloads.
+        - Designed and deployed an Istio service mesh with an OAuth2 proxy integrated with Okta, improving authentication, authorization and audit across all EKS clusters.
+        - Automated OS package installation and continuous patch management using AWS SSM Documents, reducing manual toil and improving compliance.
+        - Drove 20% AWS cost savings across the organization by deploying unused-resource management frameworks and tuning the logging platform; negotiated Savings Plans and RDS Reserved Instances with the Finance/CFO office.
+        - Supported the Data Science team as AI Ops engineer, helping scale AI infrastructure and model deployment pipelines.
+        - Building a Streamlit analytics dashboard on AWS CUR v2, Snowflake and Snowflake Cortex AI, and contributing to Snowflake Intelligence Agent and MCP-based agentic workflows.
+    - title: Senior DevOps Architect
+      company: AppZen India Ltd.
+      location: Pune, India
+      period: "Mar 2021 - Mar 2024"
+      bullets:
+        - Built and led a DevOps/SRE team focused on scalability, reliability, availability, security and cost optimization of the AppZen SaaS platform.
+        - Designed and operated an end-to-end observability pipeline (Prometheus, Telegraf, Grafana, InfluxDB, VictoriaMetrics, Fluent Bit, FluentD, Elasticsearch), including a 100 TB+ Elasticsearch cluster on EKS using the ECK operator.
+        - "Owned Day-1 Kubernetes platform services: EBS CSI driver, Cert-Manager, CloudWatch adapter, Cluster Autoscaler, EFS provisioner, External Secrets, Fluent Bit, ingress controllers, Prometheus and ArgoCD, establishing a consistent platform foundation for application squads."
+        - "Administered EKS at scale: RBAC-based access, HPA tuning, GitOps troubleshooting, cost governance and capacity planning."
+        - Delivered multiple security initiatives including WAF for public APIs and CDNs, container image scanning with Trivy and Harbor, and strengthening AWS posture via SecurityHub, Config, GuardDuty, CloudTrail and VPC Flow Logs.
+        - Wrote automation in Python, Bash and Jenkins pipelines; authored Infrastructure-as-Code modules in Terraform for repeatable, auditable environment provisioning.
+        - Partnered with Finance and engineering leadership on enterprise cloud cost management, including AWS Savings Plans, RDS Reserved Instances, and MySQL/PostgreSQL query tuning recommendations that materially reduced RDS spend.
+    - title: Technical Architect
+      company: Mindtree Ltd.
+      location: Pune, India
+      period: "Feb 2020 - Mar 2021"
+      bullets:
+        - Designed and delivered solutions across AWS and Azure, including administration of Kubernetes (EKS and standalone) clusters.
+        - Built and maintained a Container-as-a-Service self-service portal using Azure DevOps, Ansible, Kubernetes and Jenkins.
+        - Authored Terraform modules and CI/CD pipelines for common cloud services (compute, storage, load balancers, DNS) across Azure and AWS.
+        - Automated distribution, hardening and creation of Linux servers; designed serverless architectures on AWS.
+        - Developed a bulk email platform using AWS SES, Postfix Relay, Kinesis Firehose, S3, RDS and CloudWatch.
+    - title: Technical Lead
+      company: John Deere Financial
+      location: Pune, India
+      period: "May 2019 - Jan 2020"
+      bullets:
+        - Designed and delivered Jenkins-as-a-Service (JaaS) on containers hosted on AWS ECS, providing a shared CI/CD platform for enterprise teams.
+        - Architected an AWS Config custom conformance pack for auto-remediation of non-compliant rules, strengthening governance at scale.
+        - Designed complex Terraform architectures for enterprise applications; automated cross-region, cross-account event publishing using Python and Jenkins.
+        - Created global and regional WAF templates via Terraform for a PHP application; exposed on-prem REST services through API Gateway and Lambda wrappers.
+        - Implemented automation to enforce GitHub org and repository compliance across the enterprise.
+    - title: Associate Solutions Engineer
+      company: Western Union India Pvt Ltd.
+      location: Pune, India
+      period: "Jul 2017 - May 2019"
+      bullets:
+        - "Developed serverless architectures on AWS (Lambda, SQS, SNS, RDS, Redis Cache) and built Web APIs in .NET Core 2.0 exposed via AWS API Gateway."
+        - Built CI/CD pipelines using Jenkins and Octopus; produced custom NuGet packages for reusable build artifacts.
+        - Delivered containerized workloads using Docker and AWS Elastic Beanstalk.
+    - title: Associate
+      company: Cognizant Technology Solutions India Pvt. Ltd.
+      location: Pune, India
+      period: "Dec 2011 - Jun 2017"
+      bullets:
+        - Developed full-stack solutions using C#, .NET Core, JavaScript, Angular and TypeScript.
+        - Performed design, coding, database modification, unit testing and CI/CD pipeline setup on Microsoft SQL Server-backed applications.
+  certifications:
+    - "AWS Certified Solutions Architect - Associate"
+    - "AWS Certified Developer - Associate"
+    - "Western Union Best Employee Award"
+    - "Western Union Best Project Award - end-to-end serverless bulk mail relay solution"
+  education:
+    - degree: "Bachelor of Technology, Computer Science"
+      institution: Biju Patnaik University of Technology
+      period: "2007 - 2011"
