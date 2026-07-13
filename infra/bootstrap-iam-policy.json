@@ -77,8 +77,8 @@
         "ecs:ListTagsForResource"
       ],
       "Resource": [
-        "arn:aws:ecs:${AWS_REGION}:${AWS_ACCOUNT_ID}:cluster/portfolio-cluster",
-        "arn:aws:ecs:${AWS_REGION}:${AWS_ACCOUNT_ID}:service/portfolio-cluster/portfolio"
+        "arn:aws:ecs:${AWS_REGION}:${AWS_ACCOUNT_ID}:cluster/${PROJECT_NAME}-cluster",
+        "arn:aws:ecs:${AWS_REGION}:${AWS_ACCOUNT_ID}:service/${PROJECT_NAME}-cluster/${PROJECT_NAME}"
       ]
     },
     {
@@ -104,7 +104,7 @@
         "logs:UntagResource",
         "logs:ListTagsForResource"
       ],
-      "Resource": "arn:aws:logs:${AWS_REGION}:${AWS_ACCOUNT_ID}:log-group:/ecs/portfolio*"
+      "Resource": "arn:aws:logs:${AWS_REGION}:${AWS_ACCOUNT_ID}:log-group:/ecs/${PROJECT_NAME}*"
     },
     {
       "Sid": "IamRolesForEcsAndGithubActions",
@@ -126,7 +126,7 @@
         "iam:UntagRole",
         "iam:ListRoleTags"
       ],
-      "Resource": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/portfolio-*"
+      "Resource": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${PROJECT_NAME}-*"
     },
     {
       "Sid": "GithubOidcProvider",

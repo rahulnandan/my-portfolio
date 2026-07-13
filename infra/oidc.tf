@@ -18,7 +18,7 @@ locals {
 }
 
 # Deploy role assumable ONLY by GitHub Actions runs on this exact repo's
-# master branch - not other branches, not forks, not other repos. This is
+# main branch - not other branches, not forks, not other repos. This is
 # what reusable-deploy-ecs.yml assumes via
 # aws-actions/configure-aws-credentials; no long-lived AWS keys are stored
 # in GitHub at all.
@@ -36,7 +36,7 @@ resource "aws_iam_role" "github_actions_deploy" {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
         }
         StringLike = {
-          "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/master"
+          "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/main"
         }
       }
     }]
