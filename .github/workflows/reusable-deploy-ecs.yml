@@ -21,7 +21,13 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
+    # Deliberately no `environment:` here. Declaring one makes GitHub swap the
+    # OIDC token's `sub` claim from `repo:<org>/<repo>:ref:refs/heads/main` to
+    # `repo:<org>/<repo>:environment:<name>`, which no longer matches the IAM
+    # trust policy in infra/oidc.tf and fails the AssumeRole. To add an
+    # environment (e.g. for required approvers), update that trust policy to
+    # match the environment sub and restrict the environment's deployment
+    # branches to main in GitHub settings.
     steps:
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
