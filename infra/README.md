@@ -92,7 +92,18 @@ Copy these `terraform output` values into the GitHub repo's
 Plus two Docker Hub secrets (not from Terraform): `DOCKERHUB_USERNAME` and
 `DOCKERHUB_TOKEN` (a Docker Hub access token, not your password).
 
-Then browse to the `alb_dns_name` output — that's the public URL.
+Then browse to the `app_url` output — that's the public URL.
+
+## HTTPS
+
+Set `root_domain` and `app_hostname` in `terraform.tfvars` (see `dns.tf`) and
+the stack requests an ACM certificate, DNS-validates it through your Route 53
+hosted zone, adds a TLS 1.2+ listener on 443, and demotes port 80 to a 301
+redirect. Leave them empty and the stack stays HTTP-only on the ALB hostname.
+
+There is no way to serve HTTPS on the ALB's own `*.elb.amazonaws.com` name:
+AWS owns that domain and ACM will not issue a certificate for a name you don't
+control. HTTPS therefore requires a domain you own.
 
 ## Cost/security choices made here (and how to tighten them)
 

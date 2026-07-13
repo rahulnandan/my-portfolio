@@ -51,8 +51,9 @@ runs `terraform apply`; it only updates the ECS service's task definition
      `ECS_TASK_DEFINITION_FAMILY`, `CONTAINER_NAME`
 4. Push a feature branch → CI runs. Merge/push to `main` → CD builds,
    pushes, and deploys.
-5. Open `http://<alb_dns_name>` (from `terraform output alb_dns_name`) in a
-   browser on your laptop — that's the public URL, fronted by the ALB.
+5. Open `terraform output app_url` in a browser on your laptop — that's the
+   public URL, fronted by the ALB. Currently
+   **https://portfolio.rahulnandan.dev**.
 
 ## Running locally
 
@@ -70,5 +71,12 @@ docker run -p 8080:8080 portfolio
   ~$32/month; inbound still locked to the ALB's security group only.
 - **OIDC federation** for GitHub Actions → AWS, scoped to
   `repo:<org>/<repo>:ref:refs/heads/main` — no long-lived AWS keys anywhere.
+- **HTTPS** via an ACM certificate (DNS-validated in Route 53), TLS 1.2+ only,
+  with port 80 permanently redirecting rather than serving. Note an ALB can
+  never have a certificate for its own `*.amazonaws.com` name — AWS owns that
+  domain — so TLS requires a domain you control.
 - **Deployment circuit breaker + rollback** on the ECS service.
 - **14-day CloudWatch log retention** to bound log storage cost.
+- **Least-privilege IAM**, with the policy that governs Terraform's own user
+  kept in a separate stack (`infra/bootstrap/`) applied by an admin principal —
+  a user that can rewrite its own policy can grant itself admin.
