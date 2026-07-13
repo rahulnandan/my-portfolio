@@ -27,8 +27,11 @@ jobs:
           java-version: ${{ inputs.java-version }}
           cache: maven
 
+      # `compile` is required, not redundant: SpotBugs analyses compiled
+      # bytecode, so without target/classes it silently emits no report
+      # (PMD reads source, so it would still work and mask the problem).
       - name: Generate SpotBugs + PMD site
-        run: mvn -B site
+        run: mvn -B compile site
 
       - name: Upload analysis site artifact
         uses: actions/upload-artifact@v4
