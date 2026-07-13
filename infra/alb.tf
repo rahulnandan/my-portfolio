@@ -36,17 +36,49 @@ resource "aws_lb_target_group" "this" {
   }
 }
 
+# Port 80. Once HTTPS is configured (see dns.tf) this stops serving the app
+# and permanently redirects to HTTPS instead, so plaintext is never an option
+# for real traffic. Without a domain there is nothing to redirect *to*, so it
+# forwards directly.
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80
   protocol          = "HTTP"
 
+  dynamic "default_action" {
+    for_each = local.https_enabled ? [1] : []
+    content {
+      type = "redirect"
+      redirect {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
+    }
+  }
+
+  dynamic "default_action" {
+    for_each = local.https_enabled ? [] : [1]
+    content {
+      type             = "forward"
+      target_group_arn = aws_lb_target_group.this.arn
+    }
+  }
+}
+
+resource "aws_lb_listener" "https" {
+  count             = local.https_enabled ? 1 : 0
+  load_balancer_arn = aws_lb.this.arn
+  port              = 443
+  protocol          = "HTTPS"
+
+  # TLS 1.2+ only. The AWS default policy still negotiates TLS 1.0/1.1, which
+  # fails most modern security baselines.
+  ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn = aws_acm_certificate_validation.this[0].certificate_arn
+
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn
   }
-
-  # No HTTPS listener by default - there's no domain/ACM cert wired up for
-  # this demo. To add TLS: request/validate an ACM cert, add a 443 listener
-  # using it, and either redirect this HTTP listener to HTTPS or drop it.
 }

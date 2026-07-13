@@ -8,13 +8,16 @@ target/
 .vscode/
 
 # Terraform
-infra/.terraform/
-infra/.terraform.lock.hcl
-infra/*.tfstate
-infra/*.tfstate.*
-infra/*.tfvars
-!infra/*.tfvars.example
-infra/crash.log
+# Unanchored so these match at any depth (infra/, infra/bootstrap/, ...).
+# Anchored paths previously missed infra/bootstrap/ and a 674MB provider
+# binary got committed.
+**/.terraform/
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
 
 # OS
 .DS_Store
