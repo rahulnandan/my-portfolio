@@ -40,15 +40,19 @@ runs `terraform apply`; it only updates the ECS service's task definition
 
 ## One-time setup
 
-1. Create the Docker Hub repository `<you>/portfolio` (or let the first push
+1. Create the Docker Hub repository `<you>/myportfolio` (or let the first push
    create it) and generate a Docker Hub **access token**.
 2. `cd infra && terraform init && terraform apply` (see that directory's
-   README for the IAM bootstrap user, variables, and cost/security notes).
+   README for AWS credentials, variables, HTTPS, and cost/security notes).
 3. In GitHub **Settings → Secrets and variables → Actions**, add:
-   - Secrets: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`
-   - Variables (from `terraform output`): `AWS_DEPLOY_ROLE_ARN`,
-     `AWS_REGION`, `ECS_CLUSTER`, `ECS_SERVICE`,
+   - Secrets: `DOCKERHUB_TOKEN`
+   - Variables: `DOCKERHUB_USERNAME`, plus from `terraform output` —
+     `AWS_DEPLOY_ROLE_ARN`, `AWS_REGION`, `ECS_CLUSTER`, `ECS_SERVICE`,
      `ECS_TASK_DEFINITION_FAMILY`, `CONTAINER_NAME`
+
+   `DOCKERHUB_USERNAME` must be a **variable**, not a secret: the image
+   reference is a workflow output, and GitHub scrubs any output whose value
+   contains a secret — which silently emptied it and broke the deploy.
 4. Push a feature branch → CI runs. Merge/push to `main` → CD builds,
    pushes, and deploys.
 5. Open `terraform output app_url` in a browser on your laptop — that's the
@@ -69,14 +73,21 @@ docker run -p 8080:8080 portfolio
 - **ECS Fargate**, 256 CPU / 512 MB — cheapest Fargate tier, no servers to patch.
 - **No NAT Gateway** — public subnets + public IP on the task instead, saving
   ~$32/month; inbound still locked to the ALB's security group only.
-- **OIDC federation** for GitHub Actions → AWS, scoped to
-  `repo:<org>/<repo>:ref:refs/heads/main` — no long-lived AWS keys anywhere.
+- **OIDC federation** for GitHub Actions → AWS — no long-lived AWS keys in CI at
+  all. The assumed role is scoped to `ecs:UpdateService` on this one service,
+  and its trust policy only accepts tokens from
+  `repo:<org>/<repo>:ref:refs/heads/main`, so it is unusable from another
+  branch, a fork, or another repo.
 - **HTTPS** via an ACM certificate (DNS-validated in Route 53), TLS 1.2+ only,
   with port 80 permanently redirecting rather than serving. Note an ALB can
   never have a certificate for its own `*.amazonaws.com` name — AWS owns that
   domain — so TLS requires a domain you control.
 - **Deployment circuit breaker + rollback** on the ECS service.
 - **14-day CloudWatch log retention** to bound log storage cost.
-- **Least-privilege IAM**, with the policy that governs Terraform's own user
-  kept in a separate stack (`infra/bootstrap/`) applied by an admin principal —
-  a user that can rewrite its own policy can grant itself admin.
+- **Task security group** accepts traffic only from the ALB's security group,
+  never from the internet, despite the task holding a public IP.
+
+Known tradeoff: local Terraform runs use an IAM user with `AdministratorAccess`
+rather than a least-privilege policy — see the note in
+[infra/README.md](infra/README.md). The CI deploy path is unaffected and uses
+scoped, keyless OIDC.

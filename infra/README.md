@@ -12,27 +12,28 @@ cp terraform.tfvars.example terraform.tfvars
 # edit terraform.tfvars: your Docker Hub image, GitHub org/repo, region
 ```
 
-## 2. Create the IAM user this stack runs as
+## 2. AWS credentials
 
-Don't use your root account or a personal admin user. The dedicated,
-least-privilege user — and the policy constraining it — is its own Terraform
-stack: see [`bootstrap/`](bootstrap/). Apply that first, with admin
-credentials, then configure a profile with its access key:
+Configure a profile for an IAM user that can create the resources below (VPC,
+ALB, ECS, ACM, Route 53 records, and the IAM roles in `oidc.tf`):
 
 ```bash
-aws configure --profile rahuls-portfolio-terraform
-export AWS_PROFILE=rahuls-portfolio-terraform
+aws configure --profile <your-profile>
+export AWS_PROFILE=<your-profile>
 ```
 
-It lives in a separate stack on purpose: the user below runs *this* stack, so
-if it could edit its own policy it could grant itself admin in one apply.
-
-Most actions in the policy are scoped to `<project_name>-*` resource names.
-EC2 networking, ECS task-definition registration, and a few others are
-`Resource: "*"` only because those specific AWS APIs don't support
-resource-level IAM conditions — not a scoping choice. The user has no console
-password and no permissions outside this stack (no S3, no billing, no other
-services), so a leaked access key's blast radius is limited to these resources.
+> **Note on posture.** This project currently uses an IAM user with
+> `AdministratorAccess` for local Terraform runs. That is convenient but broad:
+> the access key is long-lived, so if it leaks the blast radius is the whole
+> account rather than this stack. A least-privilege alternative is to scope the
+> user to just the actions this stack needs and apply that policy from a
+> separate admin-run stack (a user that can edit its own policy can always
+> escalate to admin, so the policy cannot live in the stack it governs).
+>
+> Note this applies only to *local* Terraform runs. The **deploy path is not
+> affected**: GitHub Actions authenticates via OIDC federation with no
+> long-lived keys at all, assuming a role scoped to `ecs:UpdateService` on this
+> one service, and only from `refs/heads/main` (see `oidc.tf`).
 
 ## 3. Provision
 
@@ -64,8 +65,16 @@ Copy these `terraform output` values into the GitHub repo's
 | `ecs_task_family`            | `ECS_TASK_DEFINITION_FAMILY`| Variable |
 | `container_name`             | `CONTAINER_NAME`            | Variable |
 
-Plus two Docker Hub secrets (not from Terraform): `DOCKERHUB_USERNAME` and
-`DOCKERHUB_TOKEN` (a Docker Hub access token, not your password).
+Plus two Docker Hub values (not from Terraform):
+
+| GitHub name          | Type     | Value                                        |
+|-----------------------|----------|----------------------------------------------|
+| `DOCKERHUB_USERNAME`  | Variable | your Docker Hub account name                  |
+| `DOCKERHUB_TOKEN`     | Secret   | a Docker Hub access token, not your password  |
+
+`DOCKERHUB_USERNAME` must be a **variable**, not a secret. The image reference
+is emitted as a workflow output, and GitHub scrubs any output whose value
+contains a secret — as a secret it silently arrived empty at the deploy job.
 
 Then browse to the `app_url` output — that's the public URL.
 
