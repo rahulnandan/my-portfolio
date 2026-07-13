@@ -2,7 +2,7 @@ name: Reusable - Publish Analysis to GitHub Pages
 
 # Publishes the static-analysis report artifact to the gh-pages branch,
 # under a per-branch path (keep_files: true means branches don't clobber
-# each other) - e.g. https://<user>.github.io/<repo>/master/ and
+# each other) - e.g. https://<user>.github.io/<repo>/main/ and
 # https://<user>.github.io/<repo>/feature-x/. Uses the automatic
 # GITHUB_TOKEN, no extra secret required.
 

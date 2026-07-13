@@ -3,8 +3,12 @@ name: Reusable - Docker Build & Push
 on:
   workflow_call:
     inputs:
+      image-name:
+        description: Docker Hub repository name (appended to the Docker Hub username).
+        type: string
+        default: myportfolio
       push-latest:
-        description: Also tag and push ":latest" (master builds only).
+        description: Also tag and push ":latest" (main builds only).
         type: boolean
         default: false
     secrets:
@@ -31,7 +35,7 @@ jobs:
       - name: Compute image tags
         id: meta
         run: |
-          repo="${{ secrets.dockerhub-username }}/portfolio"
+          repo="${{ secrets.dockerhub-username }}/${{ inputs.image-name }}"
           # Branch names can contain "/" (e.g. feature/x), which isn't a
           # valid Docker tag component - flatten it.
           safe_ref="$(echo "${{ github.ref_name }}" | tr '/' '-')"

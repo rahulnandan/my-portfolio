@@ -1,6 +1,6 @@
 name: CI - Feature Branch
 
-# Runs on every push to any branch except master: compile+test, static
+# Runs on every push to any branch except main: compile+test, static
 # analysis published to GitHub Pages, and a Docker image build/push tagged
 # with the branch+sha (not :latest). No AWS deploy here - a shared public
 # ECS service shouldn't be redeployed on every feature push.
@@ -8,7 +8,7 @@ name: CI - Feature Branch
 on:
   push:
     branches-ignore:
-      - master
+      - main
 
 concurrency:
   group: ci-${{ github.ref }}

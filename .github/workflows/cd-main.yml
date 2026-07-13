@@ -1,16 +1,16 @@
-name: CD - Master
+name: CD - Main
 
-# Runs on every push to master (a merged PR lands here as a push event):
+# Runs on every push to main (a merged PR lands here as a push event):
 # the same build/analysis/pages/docker pipeline as feature branches, plus
 # tagging :latest and deploying to ECS Fargate via OIDC.
 
 on:
   push:
     branches:
-      - master
+      - main
 
 concurrency:
-  group: cd-master
+  group: cd-main
   cancel-in-progress: false # never cancel a deploy mid-flight; queue instead
 
 permissions:
