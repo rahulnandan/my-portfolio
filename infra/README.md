@@ -12,52 +12,27 @@ cp terraform.tfvars.example terraform.tfvars
 # edit terraform.tfvars: your Docker Hub image, GitHub org/repo, region
 ```
 
-## 2. Create a dedicated IAM user for running Terraform
+## 2. Create the IAM user this stack runs as
 
-Don't use your root account or a personal admin user for this. Create a
-user scoped to exactly what this stack needs, using
-[`bootstrap-iam-policy.json`](bootstrap-iam-policy.json) — its resource ARNs
-are parameterized on your `project_name`/region, read straight out of the
-`terraform.tfvars` you just created:
-
-```bash
-ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-REGION=$(grep aws_region terraform.tfvars | cut -d'"' -f2)
-PROJECT_NAME=$(grep project_name terraform.tfvars | cut -d'"' -f2)
-IAM_USER_NAME="${PROJECT_NAME}-terraform"
-
-sed -e "s/\${AWS_ACCOUNT_ID}/${ACCOUNT_ID}/g" \
-    -e "s/\${AWS_REGION}/${REGION}/g" \
-    -e "s/\${PROJECT_NAME}/${PROJECT_NAME}/g" \
-  bootstrap-iam-policy.json > /tmp/${PROJECT_NAME}-terraform-policy.json
-
-aws iam create-policy \
-  --policy-name "${PROJECT_NAME}-terraform-bootstrap" \
-  --policy-document "file:///tmp/${PROJECT_NAME}-terraform-policy.json"
-
-aws iam create-user --user-name "${IAM_USER_NAME}"
-
-aws iam attach-user-policy \
-  --user-name "${IAM_USER_NAME}" \
-  --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${PROJECT_NAME}-terraform-bootstrap"
-
-aws iam create-access-key --user-name "${IAM_USER_NAME}"
-# save the AccessKeyId/SecretAccessKey it prints - shown only once
-```
-
-Configure a named profile with those keys and use it for every command below:
+Don't use your root account or a personal admin user. The dedicated,
+least-privilege user — and the policy constraining it — is its own Terraform
+stack: see [`bootstrap/`](bootstrap/). Apply that first, with admin
+credentials, then configure a profile with its access key:
 
 ```bash
-aws configure --profile ${PROJECT_NAME}-terraform
-export AWS_PROFILE=${PROJECT_NAME}-terraform
+aws configure --profile rahuls-portfolio-terraform
+export AWS_PROFILE=rahuls-portfolio-terraform
 ```
 
-Most actions in the policy are scoped to `<project_name>-*` resource names;
-EC2 networking and ECS task-definition registration are `Resource: "*"`
-only because those specific AWS APIs don't support resource-level IAM
-conditions — not a scoping choice. This user has no console password and no
-permissions outside this stack (no S3, no billing, no other services), so a
-leaked access key's blast radius is limited to these specific resources.
+It lives in a separate stack on purpose: the user below runs *this* stack, so
+if it could edit its own policy it could grant itself admin in one apply.
+
+Most actions in the policy are scoped to `<project_name>-*` resource names.
+EC2 networking, ECS task-definition registration, and a few others are
+`Resource: "*"` only because those specific AWS APIs don't support
+resource-level IAM conditions — not a scoping choice. The user has no console
+password and no permissions outside this stack (no S3, no billing, no other
+services), so a leaked access key's blast radius is limited to these resources.
 
 ## 3. Provision
 

@@ -7,9 +7,9 @@
 # would be meaningless. Keeping the policy out of the stack it governs is the
 # whole point of the split.
 #
-# The policy body is ../bootstrap-iam-policy.json, shared verbatim with the
-# console-paste workflow (see scripts/render-iam-policy.sh) so there is exactly
-# one source of truth for these permissions.
+# The policy body lives in iam-policy.json alongside this file. Apply this stack
+# with admin credentials to change it; see README.md for the one-time import of
+# the user and policy that already exist in AWS.
 
 terraform {
   required_version = ">= 1.6.0"
@@ -28,7 +28,7 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 locals {
-  policy_json = templatefile("${path.module}/../bootstrap-iam-policy.json", {
+  policy_json = templatefile("${path.module}/iam-policy.json", {
     AWS_ACCOUNT_ID = data.aws_caller_identity.current.account_id
     AWS_REGION     = var.aws_region
     PROJECT_NAME   = var.project_name
