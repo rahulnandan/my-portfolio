@@ -87,6 +87,7 @@ docker run -p 8080:8080 portfolio
 - **Task security group** accepts traffic only from the ALB's security group,
   never from the internet, despite the task holding a public IP.
 
+
 Known tradeoff: local Terraform runs use an IAM user with `AdministratorAccess`
 rather than a least-privilege policy — see the note in
 [infra/README.md](infra/README.md). The CI deploy path is unaffected and uses
