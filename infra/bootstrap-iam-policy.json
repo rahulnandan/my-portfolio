@@ -100,6 +100,41 @@
       "Resource": "*"
     },
     {
+      "Sid": "AcmCertificateForHttps",
+      "Effect": "Allow",
+      "Action": [
+        "acm:RequestCertificate",
+        "acm:DeleteCertificate",
+        "acm:DescribeCertificate",
+        "acm:ListCertificates",
+        "acm:AddTagsToCertificate",
+        "acm:RemoveTagsFromCertificate",
+        "acm:ListTagsForCertificate"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "Route53DnsValidationAndAliasRecord",
+      "Effect": "Allow",
+      "Action": [
+        "route53:ChangeResourceRecordSets",
+        "route53:ListResourceRecordSets",
+        "route53:GetHostedZone",
+        "route53:ListTagsForResource"
+      ],
+      "Resource": "arn:aws:route53:::hostedzone/*"
+    },
+    {
+      "Sid": "Route53LookupsNoResourceLevelSupport",
+      "Effect": "Allow",
+      "Action": [
+        "route53:ListHostedZones",
+        "route53:ListHostedZonesByName",
+        "route53:GetChange"
+      ],
+      "Resource": "*"
+    },
+    {
       "Sid": "CloudWatchLogGroup",
       "Effect": "Allow",
       "Action": [
@@ -180,6 +215,16 @@
         "iam:ListRoles"
       ],
       "Resource": "*"
+    },
+    {
+      "Sid": "IamPolicyReadOnlyForDriftDetection",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion",
+        "iam:ListPolicyVersions"
+      ],
+      "Resource": "arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${PROJECT_NAME}-terraform-bootstrap"
     },
     {
       "Sid": "GithubOidcProvider",

@@ -51,6 +51,22 @@ variable "log_retention_days" {
   default     = 14
 }
 
+variable "root_domain" {
+  description = <<-EOT
+    Public hosted zone already in Route 53 (e.g. "rahulnandan.dev"). Leave
+    empty to skip HTTPS entirely and serve HTTP-only on the ALB's
+    *.amazonaws.com name (no ACM cert is possible for that name).
+  EOT
+  type        = string
+  default     = ""
+}
+
+variable "app_hostname" {
+  description = "Fully qualified name to serve the app on, e.g. \"portfolio.rahulnandan.dev\". Required when root_domain is set."
+  type        = string
+  default     = ""
+}
+
 variable "github_org" {
   description = "GitHub org/user that owns the repository (used to scope the OIDC trust policy)."
   type        = string

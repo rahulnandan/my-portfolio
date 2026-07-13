@@ -1,6 +1,11 @@
 output "alb_dns_name" {
-  description = "Public URL of the deployed app (http://<this>)."
+  description = "The ALB's own hostname. Serves the app directly only when HTTPS is disabled; otherwise it redirects to app_url."
   value       = aws_lb.this.dns_name
+}
+
+output "app_url" {
+  description = "Public URL of the deployed app."
+  value       = local.https_enabled ? "https://${var.app_hostname}" : "http://${aws_lb.this.dns_name}"
 }
 
 output "aws_region" {
