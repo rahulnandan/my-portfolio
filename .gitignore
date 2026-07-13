@@ -8,13 +8,13 @@ target/
 .vscode/
 
 # Terraform
-infra/terraform/.terraform/
-infra/terraform/.terraform.lock.hcl
-infra/terraform/*.tfstate
-infra/terraform/*.tfstate.*
-infra/terraform/*.tfvars
-!infra/terraform/*.tfvars.example
-infra/terraform/crash.log
+infra/.terraform/
+infra/.terraform.lock.hcl
+infra/*.tfstate
+infra/*.tfstate.*
+infra/*.tfvars
+!infra/*.tfvars.example
+infra/crash.log
 
 # OS
 .DS_Store

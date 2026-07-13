@@ -3,14 +3,14 @@ name: Reusable - Deploy to ECS Fargate
 # Registers a new task definition revision pointing at the given image and
 # updates the ECS service to use it. Authenticates to AWS via short-lived
 # OIDC credentials (no static access keys stored anywhere) - the assumed
-# role's trust policy (see infra/terraform/oidc.tf) only allows this repo's
-# master branch to assume it.
+# role's trust policy (see infra/oidc.tf) only allows this repo's
+# main branch to assume it.
 
 on:
   workflow_call:
     inputs:
       image:
-        description: Full image reference to deploy (e.g. user/portfolio:master-abc123).
+        description: Full image reference to deploy (e.g. user/portfolio:main-abc123).
         type: string
         required: true
 
