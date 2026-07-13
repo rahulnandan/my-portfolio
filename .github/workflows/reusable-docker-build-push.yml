@@ -1,8 +1,18 @@
 name: Reusable - Docker Build & Push
 
+# The Docker Hub username is an input, not a secret, on purpose: the image
+# reference is emitted as a workflow output, and GitHub scrubs any output whose
+# value contains a secret. Building the reference from `secrets.*` therefore
+# yielded an empty `image` output downstream and broke the ECS deploy. The
+# username is not sensitive (it is half of a public image name); only the token
+# is.
 on:
   workflow_call:
     inputs:
+      dockerhub-username:
+        description: Docker Hub account that owns the image repository.
+        type: string
+        required: true
       image-name:
         description: Docker Hub repository name (appended to the Docker Hub username).
         type: string
@@ -12,8 +22,6 @@ on:
         type: boolean
         default: false
     secrets:
-      dockerhub-username:
-        required: true
       dockerhub-token:
         required: true
     outputs:
@@ -35,7 +43,7 @@ jobs:
       - name: Compute image tags
         id: meta
         run: |
-          repo="${{ secrets.dockerhub-username }}/${{ inputs.image-name }}"
+          repo="${{ inputs.dockerhub-username }}/${{ inputs.image-name }}"
           # Branch names can contain "/" (e.g. feature/x), which isn't a
           # valid Docker tag component - flatten it.
           safe_ref="$(echo "${{ github.ref_name }}" | tr '/' '-')"
@@ -51,7 +59,7 @@ jobs:
 
       - uses: docker/login-action@v3
         with:
-          username: ${{ secrets.dockerhub-username }}
+          username: ${{ inputs.dockerhub-username }}
           password: ${{ secrets.dockerhub-token }}
 
       - uses: docker/build-push-action@v6
